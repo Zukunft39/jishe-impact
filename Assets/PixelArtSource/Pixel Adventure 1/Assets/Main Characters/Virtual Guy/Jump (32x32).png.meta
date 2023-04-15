@@ -42,7 +42,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -120,19 +120,19 @@ TextureImporter:
       name: Jump (32x32)_0
       rect:
         serializedVersion: 2
-        x: 5
-        y: 0
-        width: 22
-        height: 28
-      alignment: 0
+        x: 4
+        y: 13
+        width: 25
+        height: 16
+      alignment: 9
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9556464c55525fa498495984b648ed8e
-      internalID: -2083791058
+      spriteID: 187e3705adba727429ab36d25fa78ba6
+      internalID: 1778048976
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Jump (32x32)_0: -2083791058
+      Jump (32x32)_0: 1778048976
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
