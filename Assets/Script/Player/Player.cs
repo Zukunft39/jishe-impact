@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
 {
     public bool isSkill;//是否在技能中
     public BOW bow;//弓的脚本
-    public  int WeapenStyle = 2;
+    public int WeapenStyle = 2;
     public static Player player;
     public Rigidbody2D rb;
     public float speed = 5f;
@@ -18,14 +18,16 @@ public class Player : MonoBehaviour
     Vector2 inputpos;
     public static Vector2 transfor;
     public Vector3 Playertran;//玩家的朝向
+    //以下为冲刺代码
     bool isdash = false;//是否冲刺
     float dashtime = 0.2f;
     float dashtimeleft, dashCD = 1f, dashLast = -10f;
     float dashspeed = 50f;
-    int Dashdirection;
+    int Dashdirection_X;
+    float Dashdirection_Y;//冲刺用数据
     float Force = 5f;
     bool Wantdash = false;
-    bool isAttack = false;
+    bool isAttack = false,isLadder=false,isClimbing=false;
     //以下为跳跃检测
     [Range(1, 10)]
     private float jumpSpeed = 8f;
@@ -77,24 +79,25 @@ public class Player : MonoBehaviour
     void Update()
     {
         transfor = this.gameObject.transform.position;
-        if (!beattack&&!isSkill)
+        if (!beattack && !isSkill)
         {
             if (!isdash)//玩家行动在这里面写0.0
             {
                 PlayerJumpByTwice();
                 MoveObject();
+                Climb();
                 if (Input.GetKeyDown(KeyCode.J))//攻击
                 {
                     isAttack = true;
                     NormalAttack();//正在攻击
-                                   
+
                 }
                 else
                 {
                     //isAttack = false;
                     //animator.SetBool("IsAttack", false);//攻击动画的转向
                     //hitbox.SetActive(false);//启用武器
-                }             
+                }
             }
             if (Input.GetKeyDown(KeyCode.L))
                 if (Time.time >= (dashLast + dashCD))
@@ -105,8 +108,8 @@ public class Player : MonoBehaviour
         if (beattack)
         {
             if (BeattackTime == 0.2f)
-                PlayerBeAttacking();
-            BeattackTime -= Time.deltaTime;
+                //PlayerBeAttacking();
+                BeattackTime -= Time.deltaTime;
             if (BeattackTime <= 0)
             {
                 beattack = false;
@@ -119,45 +122,40 @@ public class Player : MonoBehaviour
         isGround = Physics2D.OverlapCircle(groundCheck.position, 0.1f, ground);//地面检测
     }
     public void MoveObject()//检测玩家的朝向的基础移动
-    {       
+    {
         inputpos = rb.velocity;
         inputpos.x = Input.GetAxisRaw("Horizontal") * speed;
-        animator.SetFloat("SpeedX",Mathf.Abs(inputpos.x));//行走动画的转向
+        animator.SetFloat("SpeedX", Mathf.Abs(inputpos.x));//行走动画的转向
         rb.velocity = inputpos;
         if (inputpos.x < 0)
         {
             Playertran.x = -Mathf.Abs(Playertran.x);
-            Dashdirection = -1;
+            Dashdirection_X = -1;
+            if (Input.GetAxisRaw("Vertical") == 0)
+                Dashdirection_Y = 0;
         }
         if (inputpos.x > 0)
         {
             Playertran.x = Mathf.Abs(Playertran.x);
-            Dashdirection = 1;
+            Dashdirection_X = 1;
+            if (Input.GetAxisRaw("Vertical") == 0)
+                Dashdirection_Y = 0;
+        }
+        if (Input.GetAxisRaw("Vertical") > 0)
+        {
+            Dashdirection_Y = 0.6f;
+            if (inputpos.x == 0)
+                Dashdirection_X = 0;
+        }
+        if (Input.GetAxisRaw("Vertical") < 0)
+        {
+            Dashdirection_Y = -0.6f;
+            if (inputpos.x == 0)
+                Dashdirection_X = 0;
         }
         rb.transform.localScale = Playertran;
     }
-    private void OnCollisionEnter2D(Collision2D collision)//玩家的受击
-    {
-        if (collision.gameObject.tag == "enemy" || collision.gameObject.tag == "Bullet")// 角色受击！！！！！
-        {
-            beattack = true;
-            if (collision.gameObject.transform.position.x - this.gameObject.transform.position.x >= 0)
-                direction_e_p = -1;
-            if (collision.gameObject.transform.position.x - this.gameObject.transform.position.x < 0)
-                direction_e_p = 1;
-            //GetComponent<SpriteRenderer>().color = Color.red;
-            StartCoroutine(BeAttackedInvincibleTime());//启用受击闪烁的携程
-            this.GetComponentInChildren<HpControl>().hp -= 25; //血量减少
-            if(collision.gameObject.tag == "Bullet")
-            {
-                Instantiate(attackEffect, transform.position, Quaternion.identity);//生成攻击特效                
-                Destroy(collision.gameObject);//销毁子弹
-            }
-            rb.AddForce(new Vector2(direction_e_p * Force, 2f), ForceMode2D.Impulse);
-        }
-
-    }
-    void Dash()
+    void Dash()//冲刺完整代码
     {
         {
             if (Time.time >= (dashLast + dashCD))
@@ -165,7 +163,6 @@ public class Player : MonoBehaviour
                 Dashready();
             }
             Rush();
-
         }
         if (isdash)
         {
@@ -175,21 +172,24 @@ public class Player : MonoBehaviour
             {
                 isdash = false;
                 Wantdash = false;
-                Invoke("LayerChange",0.5f);               
+                Invoke("LayerChange", 0.5f);
+                rb.velocity = new Vector2(0, 0);
+                rb.AddForce(new Vector2(Dashdirection_X, Dashdirection_Y) * 12f, ForceMode2D.Impulse);
+                Dashdirection_Y = 0;
             }
         }
     }
-    void Rush()
+    void Rush()//冲刺
     {
         if (isdash)
             if (dashtimeleft >= 0)
             //transform.Translate(transform.right * Time.deltaTime * dashtime*Dashdirection*dashspeed);
             {
                 this.gameObject.layer = 9;
-                rb.velocity = new Vector2(dashspeed * Dashdirection, 0);
+                rb.velocity = dashspeed * new Vector2(Dashdirection_X, Dashdirection_Y);
             }
     }
-    void Dashready()
+    void Dashready()//冲刺准备
     {
         isdash = true;
         dashtimeleft = dashtime;
@@ -204,7 +204,7 @@ public class Player : MonoBehaviour
         //我是分界线，以下为优化跳跃手感内容
         if (Input.GetButtonDown("Jump") && rb.velocity.y < 0 && jumpCount > 0)
         {
-            rb.velocity = Vector2.up * 7;
+            rb.velocity = Vector2.up * 9;
         }
         else if (rb.velocity.y < 0 && !Input.GetButtonDown("Jump"))
         {
@@ -236,15 +236,9 @@ public class Player : MonoBehaviour
             jumpCount--;//这里有点问题，第一次跳跃时无法检测到跳跃，二段跳时才能检测到，如果要使用二段跳动画的话直接在这里加上调用二段跳动画就可以了
             rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
             jumpCount--;
-            isJump = false;            
+            isJump = false;
         }
     }
-  
-    public void PlayerBeAttacking()//碰到怪物了
-    {
-
-    }
-
     IEnumerator BeAttackedInvincibleTime()//受到攻击后的无敌时间
     {
         Physics2D.IgnoreLayerCollision(6, 7, true);//与敌人碰撞时
@@ -274,11 +268,11 @@ public class Player : MonoBehaviour
         if (WeapenStyle == 2)// 弓箭类武器的调用 
         {
             Debug.Log("2");
-            bow.Bow.GetComponent<SpriteRenderer>().color= Color.white;
+            bow.Bow.GetComponent<SpriteRenderer>().color = Color.white;
         }
         isAttack = true;//bool值
         StartCoroutine(TimeRecord());
-    }                   
+    }
 
     IEnumerator TimeRecord()//携程记录攻击时间
     {
@@ -296,5 +290,62 @@ public class Player : MonoBehaviour
     {
         this.gameObject.layer = 6;
     }
+    void Climb()//爬梯子
+    {
+        if (isLadder && isClimbing)
+            rb.gravityScale = 0;
+        if(isLadder)
+        {
+            if (Input.GetAxisRaw("Vertical") != 0)
+            {
+                isClimbing = true;
+            }
+            rb.velocity = new Vector2(rb.velocity.x, Input.GetAxisRaw("Vertical")*4f);
+        }
+    }
+    void ClimbCheck()//检查在梯子上时的一系列动作
+    {
+
+    }
+    private void OnCollisionEnter2D(Collision2D collision)//玩家的受击
+    {
+        if (collision.gameObject.tag == "enemy" || collision.gameObject.tag == "Bullet")// 角色受击！！！！！
+        {
+            beattack = true;
+            if (collision.gameObject.transform.position.x - this.gameObject.transform.position.x >= 0)
+                direction_e_p = -1;
+            if (collision.gameObject.transform.position.x - this.gameObject.transform.position.x < 0)
+                direction_e_p = 1;
+            //GetComponent<SpriteRenderer>().color = Color.red;
+            StartCoroutine(BeAttackedInvincibleTime());//启用受击闪烁的携程
+            this.GetComponentInChildren<HpControl>().hp -= 25; //血量减少
+            if (collision.gameObject.tag == "Bullet")
+            {
+                Instantiate(attackEffect, transform.position, Quaternion.identity);//生成攻击特效                
+                Destroy(collision.gameObject);//销毁子弹
+            }
+            rb.AddForce(new Vector2(direction_e_p * Force, 2f), ForceMode2D.Impulse);
+        }
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if(collision.gameObject.tag == "Ladder")
+        {
+            isLadder = true;
+        }
+        else
+        {
+            isLadder = false;
+            isClimbing = false;
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Ladder")
+        {
+            isLadder = false;
+            isClimbing = false;
+        }
+    }
 }
-   
+
