@@ -88,6 +88,8 @@
     <Compile Include="Assets\Script\NPC\NPC.cs" />
     <Compile Include="Assets\Script\UI\UIManager.cs" />
     <Compile Include="Assets\Script\UI\Dialog.cs" />
+    <Compile Include="Assets\Script\Chat\Chat.cs" />
+    <Compile Include="Assets\Script\Story\NPCStory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\素材资源\计设素材\山（背景）\parallax_mountain_pack\license.txt" />

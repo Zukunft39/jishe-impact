@@ -8,5 +8,4 @@ public class InteractableObject : MonoBehaviour
     public UnityEvent interactEvent;
     public Collider2D tipCollider;
     
-    
 }

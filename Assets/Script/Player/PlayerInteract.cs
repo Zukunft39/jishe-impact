@@ -17,7 +17,8 @@ public class PlayerInteract : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (playerCon.isChatting) return;
+        if (Input.GetKeyDown(KeyCode.E)||Input.GetKeyDown(KeyCode.Joystick1Button0))
         {
             Interact();
         }
