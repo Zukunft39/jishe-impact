@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 public class Player : MonoBehaviour
 {
     public bool isSkill;//是否在技能中
+    public bool isChatting;
     public BOW bow;//弓的脚本
     public  int WeapenStyle = 2;
     public static Player player;
@@ -76,6 +77,7 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
+        if (isChatting) return;
         transfor = this.gameObject.transform.position;
         if (!beattack&&!isSkill)
         {
@@ -296,5 +298,7 @@ public class Player : MonoBehaviour
     {
         this.gameObject.layer = 6;
     }
+    
+
 }
    
