@@ -124,6 +124,7 @@ MonoBehaviour:
   Bow: {fileID: 514560128}
   ArrowSpeed: 10
   SkillArrow: {fileID: 5738705178217528902, guid: fbe87cf473c8e424e8324bd660d05d0b, type: 3}
+  Bullet_tiao: 5
 --- !u!1 &1920588254
 GameObject:
   m_ObjectHideFlags: 0
@@ -691,7 +692,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8324670272472691310
 RectTransform:
   m_ObjectHideFlags: 0
@@ -798,7 +799,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8324670273064869660
 RectTransform:
   m_ObjectHideFlags: 0
@@ -874,7 +875,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8324670273127456827
 RectTransform:
   m_ObjectHideFlags: 0
